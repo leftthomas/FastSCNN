@@ -1,5 +1,4 @@
 import argparse
-
 import pandas as pd
 import torch
 import torch.optim as optim
@@ -8,10 +7,8 @@ from torch import nn
 from torchnet.engine import Engine
 from torchnet.logger import VisdomPlotLogger, VisdomLogger
 from tqdm import tqdm
-
 import utils
 from models.C3D import C3D
-from models.I3D import I3D
 from models.R2Plus1D import R2Plus1D
 from models.STTS import STTS
 
@@ -117,21 +114,16 @@ def on_end_epoch(state):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train Activity Recognition Model')
-    parser.add_argument('--data_type', default='ucf101', type=str, choices=['ucf101', 'hmdb51', 'kinetics600'],
-                        help='dataset type')
-    parser.add_argument('--gpu_ids', default='0,1,2,3', type=str, help='selected gpu')
-    parser.add_argument('--model_type', default='stts-a', type=str,
-                        choices=['stts-a', 'stts', 'i3d', 'r2plus1d', 'c3d'], help='model type')
-    # parser.add_argument('--input_type', default='rgb', type=str,
-    #                     choices=['rgb', 'flow', 'rgb+flow'], help='input frame type')
+    parser.add_argument('--data_type', default='ucf101', type=str, choices=['ucf101', 'hmdb51'], help='dataset type')
+    parser.add_argument('--gpu_ids', default='0,1', type=str, help='selected gpu')
+    parser.add_argument('--model_type', default='stts-a', type=str, choices=['stts-a', 'stts', 'r2plus1d', 'c3d'],
+                        help='model type')
     parser.add_argument('--batch_size', default=16, type=int, help='training batch size')
     parser.add_argument('--num_epochs', default=100, type=int, help='training epoch number')
-    parser.add_argument('--pre_train', default=None, type=str, help='used pre-trained model epoch name')
 
     opt = parser.parse_args()
     DATA_TYPE, GPU_IDS, BATCH_SIZE, NUM_EPOCH = opt.data_type, opt.gpu_ids, opt.batch_size, opt.num_epochs
-    MODEL_TYPE, PRE_TRAIN, device_ids = opt.model_type, opt.pre_train, [int(gpu) for gpu in GPU_IDS.split(',')]
-    # INPUT_TYPE = opt.input_type
+    MODEL_TYPE, device_ids = opt.model_type, [int(gpu) for gpu in GPU_IDS.split(',')]
     results = {'train_loss': [], 'train_top1_accuracy': [], 'train_top5_accuracy': [], 'val_loss': [],
                'val_top1_accuracy': [], 'val_top5_accuracy': [], 'test_loss': [], 'test_top1_accuracy': [],
                'test_top5_accuracy': []}
@@ -143,40 +135,15 @@ if __name__ == '__main__':
 
     if MODEL_TYPE == 'stts-a' or MODEL_TYPE == 'stts':
         model = STTS(NUM_CLASS, (2, 2, 2, 2), MODEL_TYPE)
-    elif MODEL_TYPE == 'i3d':
-        model = I3D(NUM_CLASS)
     elif MODEL_TYPE == 'r2plus1d':
         model = R2Plus1D(NUM_CLASS, (2, 2, 2, 2))
     else:
         model = C3D(NUM_CLASS)
 
-    if PRE_TRAIN is not None:
-        checkpoint = torch.load('epochs/{}'.format(PRE_TRAIN), map_location=lambda storage, loc: storage)
-        # load pre-trained model which trained on the same dataset
-        if DATA_TYPE in PRE_TRAIN:
-            # load same type pre-trained model
-            if PRE_TRAIN.split('.')[0].split('_')[1] == MODEL_TYPE:
-                model.load_state_dict(checkpoint)
-            else:
-                raise NotImplementedError('the pre-trained model must be the same model type')
-        # warm starting model by loading weights from a model which trained on other dataset, then fine tuning
-        else:
-            if PRE_TRAIN.split('.')[0].split('_')[1] == MODEL_TYPE:
-                # don't load the parameters of last layer
-                checkpoint.pop('fc.weight')
-                checkpoint.pop('fc.bias')
-                model.load_state_dict(checkpoint, strict=False)
-            else:
-                raise NotImplementedError('the pre-trained model must be the same model type')
-        optim_configs = [{'params': model.feature.parameters(), 'lr': 1e-4},
-                         {'params': model.fc.parameters(), 'lr': 1e-4 * 10}]
-    else:
-        optim_configs = [{'params': model.parameters(), 'lr': 1e-4}]
-
     loss_criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(optim_configs, lr=1e-4, weight_decay=5e-4)
+    optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=5e-4)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.1, verbose=True)
-    print('Number of parameters:', sum(param.numel() for param in model.parameters()))
+    print("# trainable parameters:", sum(param.numel() if param.requires_grad else 0 for param in model.parameters()))
 
     model = model.to(device_ids[0])
     if len(device_ids) > 1:

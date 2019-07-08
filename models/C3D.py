@@ -6,13 +6,15 @@ class C3D(nn.Module):
     The C3D network as described in
     Tran, Du, et al. "Learning spatiotemporal features with 3d convolutional networks."
     Proceedings of the IEEE international conference on computer vision. 2015.
+    Args:
+        num_classes(int): Number of classes in the data
     """
 
-    def __init__(self, num_classes, input_channel=3):
+    def __init__(self, num_classes):
         super(C3D, self).__init__()
 
         self.feature = nn.Sequential(
-            nn.Conv3d(input_channel, 64, kernel_size=(3, 3, 3), padding=(1, 1, 1)),
+            nn.Conv3d(3, 64, kernel_size=(3, 3, 3), padding=(1, 1, 1)),
             nn.MaxPool3d(kernel_size=(1, 2, 2), stride=(1, 2, 2)),
             nn.Conv3d(64, 128, kernel_size=(3, 3, 3), padding=(1, 1, 1)),
             nn.MaxPool3d(kernel_size=(2, 2, 2), stride=(2, 2, 2)),

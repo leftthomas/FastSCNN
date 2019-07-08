@@ -135,11 +135,10 @@ class FeatureLayer(nn.Module):
             layer_sizes (tuple): An iterable containing the number of blocks in each layer
     """
 
-    def __init__(self, layer_sizes, input_channel=3):
+    def __init__(self, layer_sizes):
         super(FeatureLayer, self).__init__()
 
-        self.conv1 = SpatioTemporalConv(input_channel, 64, (1, 7, 7), stride=(1, 2, 2), padding=(0, 3, 3),
-                                        first_conv=True)
+        self.conv1 = SpatioTemporalConv(3, 64, (1, 7, 7), stride=(1, 2, 2), padding=(0, 3, 3), first_conv=True)
         self.conv2 = ResLayer(64, 64, 3, layer_sizes[0])
         self.conv3 = ResLayer(64, 128, 3, layer_sizes[1], downsample=True)
         self.conv4 = ResLayer(128, 256, 3, layer_sizes[2], downsample=True)
@@ -169,10 +168,10 @@ class R2Plus1D(nn.Module):
             layer_sizes (tuple): An iterable containing the number of blocks in each layer
         """
 
-    def __init__(self, num_classes, layer_sizes, input_channel=3):
+    def __init__(self, num_classes, layer_sizes):
         super(R2Plus1D, self).__init__()
 
-        self.feature = FeatureLayer(layer_sizes, input_channel)
+        self.feature = FeatureLayer(layer_sizes)
         self.fc = nn.Linear(512, num_classes)
 
         self.__init_weight()

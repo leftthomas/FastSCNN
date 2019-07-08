@@ -155,7 +155,8 @@ class VideoDataset(Dataset):
 
     @staticmethod
     def load_frames(file_dir):
-        frames = sorted([os.path.join(file_dir, img) for img in os.listdir(file_dir)])
+        frames = sorted([os.path.join(file_dir, img) for img in os.listdir(file_dir)],
+                        key=lambda x: int(x.split('/')[-1].split('.')[0]))
         buffer = []
         for i, frame_name in enumerate(frames):
             frame = np.array(cv2.imread(frame_name))
@@ -212,7 +213,7 @@ class VideoDataset(Dataset):
         return buffer
 
 
-def load_data(dataset='ucf101', batch_size=8):
+def load_data(dataset='ucf101', batch_size=16):
     train_data = VideoDataset(dataset=dataset, split='train')
     train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True, num_workers=8)
     val_data = VideoDataset(dataset=dataset, split='val')
@@ -229,5 +230,3 @@ def get_labels(dataset='ucf101'):
     for label in raw_labels:
         labels.append(label.replace('\n', ''))
     return sorted(labels)
-
-
