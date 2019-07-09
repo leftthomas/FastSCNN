@@ -166,27 +166,25 @@ class VideoDataset(Dataset):
 
     def crop(self, buffer, clip_len, crop_size):
         if self.split == 'train':
-            # randomly select time index for temporal jitter
             if buffer.shape[0] > clip_len:
-                time_index = np.random.randint(buffer.shape[0] - clip_len)
-            else:
-                time_index = 0
+                frame_groups = []
+                # randomly select time index for temporal jitter
+                for frames in np.array_split(buffer, clip_len, axis=0):
+                    frame_groups.append(frames[np.random.randint(frames.shape[0]), :, :, :])
+                buffer = np.stack(frame_groups, axis=0)
             # randomly select start indices in order to crop the video
             height_index = np.random.randint(buffer.shape[1] - crop_size)
             width_index = np.random.randint(buffer.shape[2] - crop_size)
-            # crop and jitter the video using indexing. The spatial crop is performed on
-            # the entire array, so each frame is cropped in the same location. The temporal
-            # jitter takes place via the selection of consecutive frames
         else:
-            # for val and test, select the middle and center frames
             if buffer.shape[0] > clip_len:
-                time_index = math.floor((buffer.shape[0] - clip_len) / 2)
-            else:
-                time_index = 0
+                frame_groups = []
+                # for val and test, select the middle and center frames
+                for frames in np.array_split(buffer, clip_len, axis=0):
+                    frame_groups.append(frames[math.ceil(frames.shape[0] / 2 - 1), :, :, :])
+                buffer = np.stack(frame_groups, axis=0)
             height_index = math.floor((buffer.shape[1] - crop_size) / 2)
             width_index = math.floor((buffer.shape[2] - crop_size) / 2)
-        buffer = buffer[time_index:time_index + clip_len, height_index:height_index + crop_size,
-                 width_index:width_index + crop_size, :]
+        buffer = buffer[:, height_index:height_index + crop_size, width_index:width_index + crop_size, :]
 
         # padding repeated frames to make sure the shape as same
         if buffer.shape[0] < clip_len:

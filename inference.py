@@ -1,9 +1,11 @@
 import argparse
 import math
+
 import cv2
 import numpy as np
 import torch
 import torch.nn.functional as F
+
 import utils
 from models.C3D import C3D
 from models.R2Plus1D import R2Plus1D
@@ -15,6 +17,39 @@ def center_crop(image):
     width_index = math.floor((image.shape[1] - crop_size) / 2)
     image = image[height_index:height_index + crop_size, width_index:width_index + crop_size, :]
     return np.array(image).astype(np.uint8)
+
+
+def crop_frames(buffer):
+    if buffer.shape[0] > clip_len:
+        frame_groups = []
+        # select the middle and center frames
+        for frames in np.array_split(buffer, clip_len, axis=0):
+            frame_groups.append(frames[math.ceil(frames.shape[0] / 2 - 1), :, :, :])
+        buffer = np.stack(frame_groups, axis=0)
+
+    # padding repeated frames to make sure the shape as same
+    if buffer.shape[0] < clip_len:
+        repeated = clip_len // buffer.shape[0] - 1
+        remainder = clip_len % buffer.shape[0]
+        buffered, reverse = buffer, True
+        if repeated > 0:
+            padded = []
+            for i in range(repeated):
+                if reverse:
+                    pad = buffer[::-1, :, :, :]
+                    reverse = False
+                else:
+                    pad = buffer
+                    reverse = True
+                padded.append(pad)
+            padded = np.concatenate(padded, axis=0)
+            buffer = np.concatenate((buffer, padded), axis=0)
+        if reverse:
+            pad = buffered[::-1, :, :, :][:remainder, :, :, :]
+        else:
+            pad = buffered[:remainder, :, :, :]
+        buffer = np.concatenate((buffer, pad), axis=0)
+    return buffer
 
 
 if __name__ == '__main__':
@@ -48,7 +83,6 @@ if __name__ == '__main__':
 
     # read video
     cap, retaining, clips = cv2.VideoCapture(VIDEO_NAME), True, []
-    frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     while retaining:
         retaining, frame = cap.read()
         if not retaining and frame is None:
@@ -61,24 +95,16 @@ if __name__ == '__main__':
         tmp_ = center_crop(cv2.resize(frame, (resize_width, resize_height)))
         tmp = tmp_.astype(np.float32) / 255.0
         clips.append(tmp)
-        if len(clips) == clip_len or len(clips) == frame_count:
-            inputs = np.array(clips)
-            inputs = np.expand_dims(inputs, axis=0)
-            inputs = np.transpose(inputs, (0, 4, 1, 2, 3))
-            inputs = torch.from_numpy(inputs).to(DEVICE)
-            with torch.no_grad():
-                outputs = model.forward(inputs)
-
-            prob = F.softmax(outputs, dim=-1)
-            label = torch.argmax(prob, dim=-1).detach().cpu().numpy()[0]
-
-            cv2.putText(frame, class_names[label].split(' ')[-1].strip(), (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.6,
-                        (0, 0, 255), 1)
-            cv2.putText(frame, 'prob: %.4f' % prob[0][label], (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 1)
-            clips.pop(0)
-
-        cv2.imshow('result', frame)
-        cv2.waitKey(30)
-
     cap.release()
-    cv2.destroyAllWindows()
+
+    clips = np.stack(clips, axis=0)
+    inputs = crop_frames(clips)
+    inputs = np.expand_dims(inputs, axis=0)
+    inputs = np.transpose(inputs, (0, 4, 1, 2, 3))
+    inputs = torch.from_numpy(inputs).to(DEVICE)
+    with torch.no_grad():
+        outputs = model.forward(inputs)
+
+    prob = F.softmax(outputs, dim=-1)
+    label = torch.argmax(prob, dim=-1).detach().cpu().numpy()[0]
+    print('{} is {}({.4f})'.format(VIDEO_NAME, class_names[label].split(' ')[-1].strip(), prob[0][label]))
