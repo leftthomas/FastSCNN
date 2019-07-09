@@ -117,7 +117,7 @@ Here is the model parameter, accuracy and training time details:
       <td align="center">78,409,573</td>
       <td align="center">/</td>
       <td align="center">6.5h</td>
-      <td align="center">/</td>
+      <td align="center">78,204,723</td>
       <td align="center">/</td>
       <td align="center">/</td>
     </tr>
@@ -126,7 +126,7 @@ Here is the model parameter, accuracy and training time details:
       <td align="center">33,220,990</td>
       <td align="center">/</td>
       <td align="center">10.8h</td>
-      <td align="center">/</td>
+      <td align="center">33,195,340</td>
       <td align="center">/</td>
       <td align="center">/</td>
     </tr>
@@ -135,7 +135,7 @@ Here is the model parameter, accuracy and training time details:
       <td align="center">33,208,373</td>
       <td align="center"><b>/</b></td>
       <td align="center">13.8h</td>
-      <td align="center">/</td>
+      <td align="center">33,182,723</td>
       <td align="center">/</td>
       <td align="center">/</td>
     </tr>
@@ -144,7 +144,7 @@ Here is the model parameter, accuracy and training time details:
       <td align="center">37,344,339</td>
       <td align="center">/</td>
       <td align="center">16.9h</td>
-      <td align="center">/</td>
+      <td align="center">37,318,689</td>
       <td align="center">/</td>
       <td align="center">/</td>
     </tr>
