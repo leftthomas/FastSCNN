@@ -124,7 +124,7 @@ class VideoDataset(Dataset):
                 frame = cv2.resize(frame, (resize_width, resize_height))
                 if not os.path.exists(save_name.split('.')[0]):
                     os.mkdir(save_name.split('.')[0])
-                cv2.imwrite(filename=os.path.join(save_name.split('.')[0], '0000{}.jpg'.format(str(i))), img=frame)
+                cv2.imwrite(filename=os.path.join(save_name.split('.')[0], '{}.jpg'.format(i)), img=frame)
                 i += 1
             count += 1
 
@@ -215,11 +215,11 @@ class VideoDataset(Dataset):
 
 def load_data(dataset='ucf101', batch_size=16):
     train_data = VideoDataset(dataset=dataset, split='train')
-    train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True, num_workers=8)
+    train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True, num_workers=8, pin_memory=True)
     val_data = VideoDataset(dataset=dataset, split='val')
-    val_loader = DataLoader(val_data, batch_size=batch_size, shuffle=False, num_workers=8)
+    val_loader = DataLoader(val_data, batch_size=batch_size, shuffle=False, num_workers=8, pin_memory=True)
     test_data = VideoDataset(dataset=dataset, split='test')
-    test_loader = DataLoader(test_data, batch_size=batch_size, shuffle=False, num_workers=8)
+    test_loader = DataLoader(test_data, batch_size=batch_size, shuffle=False, num_workers=8, pin_memory=True)
     return train_loader, val_loader, test_loader
 
 

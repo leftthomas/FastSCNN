@@ -1,4 +1,5 @@
 import argparse
+
 import pandas as pd
 import torch
 import torch.optim as optim
@@ -7,6 +8,7 @@ from torch import nn
 from torchnet.engine import Engine
 from torchnet.logger import VisdomPlotLogger, VisdomLogger
 from tqdm import tqdm
+
 import utils
 from models.C3D import C3D
 from models.R2Plus1D import R2Plus1D
@@ -102,13 +104,7 @@ def on_end_epoch(state):
         state['epoch'], meter_loss.value()[0], meter_accuracy.value()[0], meter_accuracy.value()[1]))
 
     # save statistics at each epoch
-    data_frame = pd.DataFrame(
-        data={'train_loss': results['train_loss'], 'train_top1_accuracy': results['train_top1_accuracy'],
-              'train_top5_accuracy': results['train_top5_accuracy'], 'val_loss': results['val_loss'],
-              'val_top1_accuracy': results['val_top1_accuracy'], 'val_top5_accuracy': results['val_top5_accuracy'],
-              'test_loss': results['test_loss'], 'test_top1_accuracy': results['test_top1_accuracy'],
-              'test_top5_accuracy': results['test_top5_accuracy']},
-        index=range(1, state['epoch'] + 1))
+    data_frame = pd.DataFrame(data=results, index=range(1, state['epoch'] + 1))
     data_frame.to_csv('statistics/{}_{}_results.csv'.format(DATA_TYPE, MODEL_TYPE), index_label='epoch')
 
 
