@@ -52,19 +52,124 @@ Visdom now can be accessed by going to `127.0.0.1:8097` in your browser.
 ```
 python inference.py --video_name data/ucf101/ApplyLipstick/v_ApplyLipstick_g04_c02.avi
 optional arguments:
---data_type                   dataset type [default value is 'ucf101'](choices=['ucf101', 'hmdb51', 'kinetics600'])
+--data_type                   dataset type [default value is 'ucf101'](choices=['ucf101', 'hmdb51'])
 --model_type                  model type [default value is 'stts-a'](choices=['stts-a', 'stts', 'r2plus1d', 'c3d'])
 --video_name                  test video name
---model_name                  model epoch name [default value is 'ucf101_st-ts-a.pth']
+--model_name                  model epoch name [default value is 'ucf101_stts-a.pth']
 ```
 The inferences will show in a pop up window.
+
+## Benchmarks
+Adam optimizer (lr=0.0001) is used with learning rate scheduling. The models are trained with 100 epochs and batch size 
+of 16 on two NVIDIA Tesla V100 (32G) GPUs. 
+
+The videos are preprocessed as 32 frames of 128x128, and cropped to 112x112.
+
+Here is the dataset details:
+<table>
+  <thead>
+    <tr>
+      <th>Dataset</th>
+      <th>UCF101</th>
+      <th>HMDB51</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td align="center">Num. of Train Videos</td>
+      <td align="center">9,537</td>
+      <td align="center">3,570</td>
+    </tr>
+    <tr>
+      <td align="center">Num. of Val Videos</td>
+      <td align="center">756</td>
+      <td align="center">1,666</td>
+    </tr>
+    <tr>
+      <td align="center">Num. of Test Videos</td>
+      <td align="center">3,783</td>
+      <td align="center">1,530</td>
+    </tr>
+    <tr>
+      <td align="center">Num. of Classes</td>
+      <td align="center">101</td>
+      <td align="center">51</td>
+    </tr>
+  </tbody>
+</table>
+
+Here is the model parameter, accuracy and training time details:
+<table>
+  <thead>
+    <tr>
+      <th>Dataset</th>
+      <th>UCF101</th>
+      <th>UCF101</th>
+      <th>UCF101</th>
+      <th>HMDB51</th>
+      <th>HMDB51</th>
+      <th>HMDB51</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td align="center">C3D</td>
+      <td align="center">78,409,573</td>
+      <td align="center">/</td>
+      <td align="center"><b>/</b></td>
+      <td align="center">/</td>
+      <td align="center">/</td>
+      <td align="center">/</td>
+    </tr>
+    <tr>
+      <td align="center">R2Plus1D</td>
+      <td align="center">33,220,990</td>
+      <td align="center">/</td>
+      <td align="center"><b>/</b></td>
+      <td align="center">/</td>
+      <td align="center">/</td>
+      <td align="center">/</td>
+    </tr>
+    <tr>
+      <td align="center">STTS</td>
+      <td align="center">33,208,373</td>
+      <td align="center">/</td>
+      <td align="center"><b>/</b></td>
+      <td align="center">/</td>
+      <td align="center">/</td>
+      <td align="center">/</td>
+    </tr>
+    <tr>
+      <td align="center">STTS-A</td>
+      <td align="center">37,344,339</td>
+      <td align="center">/</td>
+      <td align="center"><b>/</b></td>
+      <td align="center">/</td>
+      <td align="center">/</td>
+      <td align="center">/</td>
+    </tr>
+  </tbody>
+</table>
 
 ## Results
 The train/val/test loss, accuracy and confusion matrix are showed on visdom. 
 ### UCF101
+**C3D**
 ![result](results/ucf101_c3d.png)
+**R2Plus1D**
 ![result](results/ucf101_r2plus1d.png)
+**STTS**
+![result](results/ucf101_stts.png)
+**STTS-A**
+![result](results/ucf101_stts_a.png)
+
 ### HMDB51
+**C3D**
 ![result](results/hmdb51_c3d.png)
+**R2Plus1D**
 ![result](results/hmdb51_r2plus1d.png)
+**STTS**
+![result](results/ucf101_stts.png)
+**STTS-A**
+![result](results/ucf101_c3d.png)
 
