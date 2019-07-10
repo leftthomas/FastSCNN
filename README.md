@@ -115,11 +115,11 @@ Here is the model parameter, accuracy and training time details:
     <tr>
       <td align="center">C3D</td>
       <td align="center">78,409,573</td>
-      <td align="center">/</td>
+      <td align="center">52.42%</td>
       <td align="center">6.5h</td>
       <td align="center">78,204,723</td>
-      <td align="center">/</td>
-      <td align="center">/</td>
+      <td align="center"><b>29.80%</b></td>
+      <td align="center">2.4h</td>
     </tr>
     <tr>
       <td align="center">R2Plus1D</td>
@@ -127,8 +127,8 @@ Here is the model parameter, accuracy and training time details:
       <td align="center">/</td>
       <td align="center">10.8h</td>
       <td align="center">33,195,340</td>
-      <td align="center">/</td>
-      <td align="center">/</td>
+      <td align="center">27.12%</td>
+      <td align="center">3.9h</td>
     </tr>
     <tr>
       <td align="center">STTS</td>
@@ -136,8 +136,8 @@ Here is the model parameter, accuracy and training time details:
       <td align="center"><b>/</b></td>
       <td align="center">13.8h</td>
       <td align="center">33,182,723</td>
-      <td align="center">/</td>
-      <td align="center">/</td>
+      <td align="center">29.02%</td>
+      <td align="center">5.2h</td>
     </tr>
     <tr>
       <td align="center">STTS-A</td>
@@ -145,8 +145,8 @@ Here is the model parameter, accuracy and training time details:
       <td align="center">/</td>
       <td align="center">16.9h</td>
       <td align="center">37,318,689</td>
-      <td align="center">/</td>
-      <td align="center">/</td>
+      <td align="center">29.48%</td>
+      <td align="center">6.3h</td>
     </tr>
   </tbody>
 </table>
@@ -161,7 +161,7 @@ The train/val/test loss, accuracy and confusion matrix are showed on visdom.
 **STTS**
 ![result](results/ucf101_stts.png)
 **STTS-A**
-![result](results/ucf101_stts_a.png)
+![result](results/ucf101_stts-a.png)
 
 ### HMDB51
 **C3D**
@@ -169,7 +169,7 @@ The train/val/test loss, accuracy and confusion matrix are showed on visdom.
 **R2Plus1D**
 ![result](results/hmdb51_r2plus1d.png)
 **STTS**
-![result](results/ucf101_stts.png)
+![result](results/hmdb51_stts.png)
 **STTS-A**
-![result](results/ucf101_c3d.png)
+![result](results/hmdb51_stts-a.png)
 
