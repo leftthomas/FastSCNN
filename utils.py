@@ -7,7 +7,7 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 
 # global configs
-CLIP_LEN, RESIZE_HEIGHT, CROP_SIZE = 32, 128, 112
+CLIP_LEN, RESIZE_HEIGHT, CROP_SIZE = 64, 256, 224
 
 
 class VideoDataset(Dataset):
@@ -98,13 +98,13 @@ class VideoDataset(Dataset):
         frame_height = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
         frame_width = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH))
 
-        # make sure the preprocessed video has at least CLIP_LEN frames
+        # make sure the preprocessed video has at least 16 frames
         extract_frequency = 4
-        if frame_count // extract_frequency <= CLIP_LEN:
+        if frame_count // extract_frequency <= 16:
             extract_frequency -= 1
-            if frame_count // extract_frequency <= CLIP_LEN:
+            if frame_count // extract_frequency <= 16:
                 extract_frequency -= 1
-                if frame_count // extract_frequency <= CLIP_LEN:
+                if frame_count // extract_frequency <= 16:
                     extract_frequency -= 1
 
         count, i, retaining = 0, 0, True
