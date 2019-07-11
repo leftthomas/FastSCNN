@@ -124,7 +124,7 @@ Here is the model parameter, accuracy and training time details:
     <tr>
       <td align="center">R2Plus1D</td>
       <td align="center">33,220,990</td>
-      <td align="center">/</td>
+      <td align="center">64.47%</td>
       <td align="center">10.8h</td>
       <td align="center">33,195,340</td>
       <td align="center">27.12%</td>
@@ -133,7 +133,7 @@ Here is the model parameter, accuracy and training time details:
     <tr>
       <td align="center">STTS</td>
       <td align="center">33,208,373</td>
-      <td align="center"><b>/</b></td>
+      <td align="center">62.15%</td>
       <td align="center">13.8h</td>
       <td align="center">33,182,723</td>
       <td align="center">29.02%</td>
@@ -142,7 +142,7 @@ Here is the model parameter, accuracy and training time details:
     <tr>
       <td align="center">STTS-A</td>
       <td align="center">37,344,339</td>
-      <td align="center">/</td>
+      <td align="center"><b>65.13%</b></td>
       <td align="center">16.9h</td>
       <td align="center">37,318,689</td>
       <td align="center">29.48%</td>
