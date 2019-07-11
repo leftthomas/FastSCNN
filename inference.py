@@ -108,4 +108,4 @@ if __name__ == '__main__':
 
     prob = F.softmax(outputs, dim=-1)
     label = torch.argmax(prob, dim=-1).detach().cpu().numpy()[0]
-    print('{} is {}({.4f})'.format(VIDEO_NAME, class_names[label].split(' ')[-1].strip(), prob[0][label].item()))
+    print('{} is {}({:.4f})'.format(VIDEO_NAME, class_names[label].split(' ')[-1].strip(), prob[0][label].item()))
