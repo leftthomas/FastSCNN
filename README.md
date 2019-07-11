@@ -50,7 +50,7 @@ Visdom now can be accessed by going to `127.0.0.1:8097` in your browser.
 
 ### Inference Video
 ```
-python inference.py --video_name data/ucf101/ApplyLipstick/v_ApplyLipstick_g04_c02.avi
+python inference.py --video_name data/ucf101/test/ApplyLipstick/v_ApplyLipstick_g04_c02.avi
 optional arguments:
 --data_type                   dataset type [default value is 'ucf101'](choices=['ucf101', 'hmdb51'])
 --model_type                  model type [default value is 'stts-a'](choices=['stts-a', 'stts', 'r2plus1d', 'c3d'])

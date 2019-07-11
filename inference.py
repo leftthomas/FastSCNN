@@ -79,7 +79,8 @@ if __name__ == '__main__':
         model = C3D(len(class_names))
 
     checkpoint = torch.load('epochs/{}'.format(MODEL_NAME), map_location='cpu')
-    model = model.load_state_dict(checkpoint).to(DEVICE).eval()
+    model.load_state_dict(checkpoint)
+    model = model.to(DEVICE).eval()
 
     # read video
     cap, retaining, clips = cv2.VideoCapture(VIDEO_NAME), True, []
@@ -107,4 +108,4 @@ if __name__ == '__main__':
 
     prob = F.softmax(outputs, dim=-1)
     label = torch.argmax(prob, dim=-1).detach().cpu().numpy()[0]
-    print('{} is {}({.4f})'.format(VIDEO_NAME, class_names[label].split(' ')[-1].strip(), prob[0][label]))
+    print('{} is {}({.4f})'.format(VIDEO_NAME, class_names[label].split(' ')[-1].strip(), prob[0][label].item()))
