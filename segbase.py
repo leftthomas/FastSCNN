@@ -4,8 +4,6 @@ import random
 import numpy as np
 from PIL import Image, ImageOps, ImageFilter
 
-__all__ = ['SegmentationDataset']
-
 
 class SegmentationDataset(object):
     """Segmentation Base Dataset"""

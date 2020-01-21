@@ -5,7 +5,7 @@ import numpy as np
 import torch
 from PIL import Image
 
-from .segbase import SegmentationDataset
+from segbase import SegmentationDataset
 
 
 class CitySegmentation(SegmentationDataset):
@@ -133,6 +133,3 @@ def _get_city_pairs(folder, split='train'):
         mask_paths = train_mask_paths + val_mask_paths
     return img_paths, mask_paths
 
-
-if __name__ == '__main__':
-    dataset = CitySegmentation()

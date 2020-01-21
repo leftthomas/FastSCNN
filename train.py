@@ -2,26 +2,13 @@ import argparse
 import datetime
 import os
 import shutil
-import sys
 import time
 
-cur_path = os.path.abspath(os.path.dirname(__file__))
-root_path = os.path.split(cur_path)[0]
-sys.path.append(root_path)
-
 import torch
+import torch.backends.cudnn as cudnn
 import torch.nn as nn
 import torch.utils.data as data
-import torch.backends.cudnn as cudnn
-
 from torchvision import transforms
-from data import get_segmentation_dataset
-from models import get_segmentation_model
-from utils.loss import get_segmentation_loss
-from utils.distributed import *
-from utils.logger import setup_logger
-from utils import WarmupPolyLR
-from utils.score import SegmentationMetric
 
 
 def parse_args():
