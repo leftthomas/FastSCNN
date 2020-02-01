@@ -10,7 +10,7 @@ class FastSCNN(nn.Module):
         self.learning_to_down_sample = LearningToDownSample(in_channels)
         self.global_feature_extractor = GlobalFeatureExtractor()
         self.feature_fusion = FeatureFusion(scale_factor=4)
-        self.classifier = Classifier(num_classes)
+        self.classifier = Classifier(num_classes, scale_factor=8)
 
     def forward(self, x):
         shared = self.learning_to_down_sample(x)
@@ -23,6 +23,7 @@ class FastSCNN(nn.Module):
 class LearningToDownSample(nn.Module):
     def __init__(self, in_channels):
         super().__init__()
+
         self.conv = ConvBlock(in_channels=in_channels, out_channels=32, stride=2)
         self.dsconv1 = nn.Sequential(
             # depthwise convolution
@@ -49,6 +50,7 @@ class LearningToDownSample(nn.Module):
 class GlobalFeatureExtractor(nn.Module):
     def __init__(self):
         super().__init__()
+
         self.first_block = nn.Sequential(Bottleneck(64, 64, 2, 6),
                                          Bottleneck(64, 64, 1, 6),
                                          Bottleneck(64, 64, 1, 6))
@@ -92,8 +94,10 @@ class FeatureFusion(nn.Module):
 
 
 class Classifier(nn.Module):
-    def __init__(self, num_classes):
+    def __init__(self, num_classes, scale_factor):
         super().__init__()
+
+        self.scale_factor = scale_factor
         self.dsconv1 = ConvBlock(in_channels=128, out_channels=128, stride=1, dilation=1, groups=128)
         self.dsconv2 = ConvBlock(in_channels=128, out_channels=128, stride=1, dilation=1, groups=128)
         self.conv = nn.Conv2d(128, num_classes, kernel_size=1, stride=1, padding=0, bias=True)
@@ -101,12 +105,15 @@ class Classifier(nn.Module):
     def forward(self, x):
         x = self.dsconv1(x)
         x = self.dsconv2(x)
-        return self.conv(x)
+        x = self.conv(x)
+        x = F.interpolate(input=x, scale_factor=self.scale_factor, mode='bilinear', align_corners=True)
+        return x
 
 
 class ConvBlock(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size=3, stride=2, padding=1, dilation=1, groups=1):
         super().__init__()
+
         self.conv = nn.Conv2d(in_channels, out_channels, kernel_size=kernel_size, stride=stride, padding=padding,
                               dilation=dilation, groups=groups, bias=False)
         self.bn = nn.BatchNorm2d(out_channels)
