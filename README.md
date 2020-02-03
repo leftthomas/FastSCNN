@@ -36,7 +36,7 @@ run [createTrainIdLabelImgs.py](https://github.com/mcordts/cityscapesScripts/blo
 
 ## Usage
 ```
-python train.py --epochs 50 --feature_dim 256
+python train.py --crop_h 512 --crop_w 1024  --gpu_ids 0,1,2,3
 optional arguments:
 --data_path                   Data path for cityscapes dataset [default value is '/home/data/cityscapes']
 --crop_h                      Crop height for training images [default value is 1024]
