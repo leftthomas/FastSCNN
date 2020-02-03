@@ -15,7 +15,7 @@ def train(net, data_loader, train_optimizer):
     net.train()
     total_loss, total_num, train_bar = 0.0, 0, tqdm(data_loader)
     for data, target in train_bar:
-        data, target = data.to(gpu_ids[0]), target.to(gpu_ids[0])
+        data, target = data.to('cuda'), target.to('cuda')
         train_optimizer.zero_grad()
         out = net(data)
         loss = loss_criterion(out, target)
@@ -37,7 +37,7 @@ def train(net, data_loader, train_optimizer):
 #         # loop test data to predict the label by weighted knn search
 #         test_bar = tqdm(test_data_loader)
 #         for data, target, _ in test_bar:
-#             data, target = data.to(gpu_ids[0]), target.to(gpu_ids[0])
+#             data, target = data.to('cuda'), target.to('cuda')
 #             output = net(data)
 #
 #             total_num += data.size(0)
@@ -58,19 +58,18 @@ if __name__ == '__main__':
     parser.add_argument('--crop_w', default=2048, type=int, help='Crop width for training images')
     parser.add_argument('--batch_size', default=12, type=int, help='Number of data for each batch to train')
     parser.add_argument('--epochs', default=1000, type=int, help='Number of sweeps over the dataset to train')
-    parser.add_argument('--gpu_ids', default='0,1,2,3,4,5,6,7', type=str, help='Selected gpu ids to train')
 
     # args parse
     args = parser.parse_args()
     data_path, crop_h, crop_w = args.data_path, args.crop_h, args.crop_w
-    batch_size, epochs, gpu_ids = args.batch_size, args.epochs, [int(gpu) for gpu in args.gpu_ids.split(',')]
+    batch_size, epochs = args.batch_size, args.epochs
 
     # dataset, model setup, optimizer config and loss definition
     train_data = Cityscapes(root=data_path, split='train', crop_size=(crop_h, crop_w))
     val_data = Cityscapes(root=data_path, split='val')
     train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True, num_workers=4)
     val_loader = DataLoader(val_data, batch_size=batch_size, shuffle=False, num_workers=4)
-    model = nn.DataParallel(FastSCNN(in_channels=3, num_classes=19).to(gpu_ids[0]), device_ids=gpu_ids)
+    model = FastSCNN(in_channels=3, num_classes=19).to('cuda')
     optimizer = optim.SGD(model.parameters(), lr=0.045, momentum=0.9)
     print("# trainable model parameters:", sum(param.numel() if param.requires_grad else 0
                                                for param in model.parameters()))
@@ -81,8 +80,8 @@ if __name__ == '__main__':
     results = {'train_loss': [], 'test_loss': [], 'train_mIOU': [], 'test_mIOU': []}
     best_miou = 0.0
     for epoch in range(1, epochs + 1):
-        # train_loss = train(model, train_loader, optimizer)
-        # results['train_loss'].append(train_loss)
+        train_loss = train(model, train_loader, optimizer)
+        results['train_loss'].append(train_loss)
         # test_acc_1, test_acc_5 = test(model, memory_loader, test_loader)
         # results['test_acc@1'].append(test_acc_1)
         # results['test_acc@5'].append(test_acc_5)
@@ -92,4 +91,4 @@ if __name__ == '__main__':
         lr_scheduler.step()
         # if test_acc_1 > best_miou:
         #     best_miou = test_acc_1
-        #     torch.save(model.module.state_dict(), 'results/{}_{}_model.pth'.format(crop_h, crop_w))
+        #     torch.save(model.state_dict(), 'results/{}_{}_model.pth'.format(crop_h, crop_w))

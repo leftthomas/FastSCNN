@@ -36,14 +36,13 @@ run [createTrainIdLabelImgs.py](https://github.com/mcordts/cityscapesScripts/blo
 
 ## Usage
 ```
-python train.py --crop_h 512 --crop_w 1024  --gpu_ids 0,1,2,3
+python train.py --crop_h 512 --crop_w 1024
 optional arguments:
 --data_path                   Data path for cityscapes dataset [default value is '/home/data/cityscapes']
 --crop_h                      Crop height for training images [default value is 1024]
 --crop_w                      Crop width for training images [default value is 2048]
 --batch_size                  Number of data for each batch to train [default value is 12]
 --epochs                      Number of sweeps over the dataset to train [default value is 1000]
---gpu_ids                     Selected gpu ids to train [default value is '0,1,2,3,4,5,6,7']
 ```
 
 ## Results
