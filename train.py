@@ -74,11 +74,9 @@ if __name__ == '__main__':
     optimizer = optim.SGD(model.parameters(), lr=0.045, momentum=0.9, weight_decay=4e-5)
 
     # model profile, learning scheduler and loss definition
-    input = torch.randn(1, 3, crop_h, crop_w).cuda()
-    flops, params = profile(model, inputs=(input,))
+    flops, params = profile(model, inputs=(torch.randn(1, 3, crop_h, crop_w).cuda(),))
     flops, params = clever_format([flops, params])
     print('# Model Params: {} FLOPs: {}'.format(params, flops))
-    del input
     lr_scheduler = PolynomialLRScheduler(optimizer, max_decay_steps=epochs, power=0.9)
     loss_criterion = nn.CrossEntropyLoss(ignore_index=255)
 
