@@ -9,6 +9,10 @@ A PyTorch implementation of Fast-SCNN based on the paper [Fast-SCNN: Fast Semant
 ```
 conda install pytorch torchvision cudatoolkit=10.0 -c pytorch
 ```
+- thop
+```
+pip install thop
+```
 - opencv
 ```
 pip install opencv-python

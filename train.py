@@ -1,9 +1,11 @@
 import argparse
 import os
+import time
 
 import pandas as pd
 import torch
 import torch.optim as optim
+from thop import profile, clever_format
 from torch import nn
 from torch.utils.data import DataLoader
 from tqdm import tqdm
@@ -20,11 +22,16 @@ def train_val(net, data_loader, train_optimizer):
     is_train = train_optimizer is not None
     net.train() if is_train else net.eval()
 
-    total_loss, total_correct, total_num, data_bar = 0.0, 0.0, 0, tqdm(data_loader)
+    total_loss, total_correct, total_time, total_num, data_bar = 0.0, 0.0, 0.0, 0, tqdm(data_loader)
     with (torch.enable_grad() if is_train else torch.no_grad()):
         for data, target in data_bar:
             data, target = data.cuda(), target.cuda()
+            torch.cuda.synchronize()
+            start_time = time.time()
             out = net(data)
+            prediction = torch.argmax(out, dim=1)
+            torch.cuda.synchronize()
+            end_time = time.time()
             loss = loss_criterion(out, target)
 
             if is_train:
@@ -33,13 +40,13 @@ def train_val(net, data_loader, train_optimizer):
                 train_optimizer.step()
 
             total_num += data.size(0)
+            total_time += end_time - start_time
             total_loss += loss.item() * data.size(0)
-            prediction = torch.argmax(out, dim=1)
             total_correct += torch.sum(prediction == target).item() / target.numel() * data.size(0)
 
-            data_bar.set_description('{} Epoch: [{}/{}] Loss: {:.4f} mPA: {:.2f}%'
-                                     .format('Train' if is_train else 'Val', epoch, epochs,
-                                             total_loss / total_num, total_correct / total_num * 100))
+            data_bar.set_description('{} Epoch: [{}/{}] Loss: {:.4f} mPA: {:.2f}% FPS: {:.0f}'
+                                     .format('Train' if is_train else 'Val', epoch, epochs, total_loss / total_num,
+                                             total_correct / total_num * 100, total_num / total_time))
 
     return total_loss / total_num, total_correct / total_num * 100
 
@@ -58,15 +65,20 @@ if __name__ == '__main__':
     data_path, crop_h, crop_w = args.data_path, args.crop_h, args.crop_w
     batch_size, epochs = args.batch_size, args.epochs
 
-    # dataset, model setup, optimizer config and loss definition
+    # dataset, model setup and optimizer config
     train_data = Cityscapes(root=data_path, split='train', crop_size=(crop_h, crop_w))
     val_data = Cityscapes(root=data_path, split='val')
     train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True, num_workers=4)
     val_loader = DataLoader(val_data, batch_size=batch_size, shuffle=False, num_workers=4)
     model = FastSCNN(in_channels=3, num_classes=19).cuda()
     optimizer = optim.SGD(model.parameters(), lr=0.045, momentum=0.9, weight_decay=4e-5)
-    print("# trainable model parameters:", sum(param.numel() if param.requires_grad else 0
-                                               for param in model.parameters()))
+
+    # model profile, learning scheduler and loss definition
+    input = torch.randn(1, 3, crop_h, crop_w).cuda()
+    flops, params = profile(model, inputs=(input,))
+    flops, params = clever_format([flops, params])
+    print('# Model Params: {} FLOPs: {}'.format(params, flops))
+    del input
     lr_scheduler = PolynomialLRScheduler(optimizer, max_decay_steps=epochs, power=0.9)
     loss_criterion = nn.CrossEntropyLoss(ignore_index=255)
 
