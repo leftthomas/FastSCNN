@@ -100,11 +100,13 @@ class Classifier(nn.Module):
         self.scale_factor = scale_factor
         self.dsconv1 = ConvBlock(in_channels=128, out_channels=128, stride=1, dilation=1, groups=128)
         self.dsconv2 = ConvBlock(in_channels=128, out_channels=128, stride=1, dilation=1, groups=128)
+        self.drop_out = nn.Dropout(p=0.1)
         self.conv = nn.Conv2d(128, num_classes, kernel_size=1, stride=1, padding=0, bias=True)
 
     def forward(self, x):
         x = self.dsconv1(x)
         x = self.dsconv2(x)
+        x = self.drop_out(x)
         x = self.conv(x)
         x = F.interpolate(input=x, scale_factor=self.scale_factor, mode='bilinear', align_corners=True)
         return x

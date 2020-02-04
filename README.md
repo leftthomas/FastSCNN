@@ -48,10 +48,9 @@ optional arguments:
 ## Results
 There are some difference between this implementation and official implementation:
 1. No `L2 regularization` used;
-2. No `Dropout` used in the last layer;
-3. The scales of `Multi-Scale Training` are `(0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0)`;
-4. No `color channels noise and brightness` used;
-5. No `auxiliary losses` at the end of `learning to downsample` and the `global feature extraction modules` used;
+2. The scales of `Multi-Scale Training` are `(0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0)`;
+3. No `color channels noise and brightness` used;
+4. No `auxiliary losses` at the end of `learning to downsample` and the `global feature extraction modules` used;
 
 <table>
 	<tbody>
