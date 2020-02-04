@@ -1,5 +1,8 @@
 import argparse
+import os
 
+import pandas as pd
+import torch
 import torch.optim as optim
 from torch import nn
 from torch.utils.data import DataLoader
@@ -9,16 +12,18 @@ from dataset import Cityscapes
 from model import FastSCNN
 from utils import PolynomialLRScheduler
 
+os.environ['CITYSCAPES_DATASET'] = 'results/'
+
 
 # train for one epoch
 def train(net, data_loader, train_optimizer):
     net.train()
     total_loss, total_num, train_bar = 0.0, 0, tqdm(data_loader)
     for data, target in train_bar:
-        data, target = data.to('cuda'), target.to('cuda')
-        train_optimizer.zero_grad()
+        data, target = data.cuda(), target.cuda()
         out = net(data)
         loss = loss_criterion(out, target)
+        train_optimizer.zero_grad()
         loss.backward()
         train_optimizer.step()
 
@@ -29,25 +34,22 @@ def train(net, data_loader, train_optimizer):
     return total_loss / total_num
 
 
-# # test for one epoch
-# def test(net, test_data_loader):
-#     net.eval()
-#     total_top1, total_top5, total_num, feature_bank = 0.0, 0.0, 0, []
-#     with torch.no_grad():
-#         # loop test data to predict the label by weighted knn search
-#         test_bar = tqdm(test_data_loader)
-#         for data, target, _ in test_bar:
-#             data, target = data.to('cuda'), target.to('cuda')
-#             output = net(data)
-#
-#             total_num += data.size(0)
-#             pred_labels = pred_scores.argsort(dim=-1, descending=True)
-#             total_top1 += torch.sum((pred_labels[:, :1] == target.unsqueeze(dim=-1)).any(dim=-1).float()).item()
-#             total_top5 += torch.sum((pred_labels[:, :5] == target.unsqueeze(dim=-1)).any(dim=-1).float()).item()
-#             test_bar.set_description('Test Epoch: [{}/{}] Acc@1:{:.2f}% Acc@5:{:.2f}%'
-#                                      .format(epoch, epochs, total_top1 / total_num * 100, total_top5 / total_num * 100))
-#
-#     return total_top1 / total_num * 100, total_top5 / total_num * 100
+# val for one epoch
+def val(net, data_loader):
+    net.eval()
+    total_loss, total_num, val_bar = 0.0, 0, tqdm(data_loader)
+    with torch.no_grad():
+        # loop val data to predict the label
+        for data, target in val_bar:
+            data, target = data.cuda(), target.cuda()
+            out = net(data)
+            loss = loss_criterion(out, target)
+            total_num += data.size(0)
+            total_loss += loss.item() * data.size(0)
+
+            val_bar.set_description('Val Epoch: [{}/{}] Loss: {:.4f}'.format(epoch, epochs, total_loss / total_num))
+
+    return total_loss / total_num
 
 
 if __name__ == '__main__':
@@ -69,25 +71,24 @@ if __name__ == '__main__':
     val_data = Cityscapes(root=data_path, split='val')
     train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True, num_workers=4)
     val_loader = DataLoader(val_data, batch_size=batch_size, shuffle=False, num_workers=4)
-    model = FastSCNN(in_channels=3, num_classes=19).to('cuda')
-    optimizer = optim.SGD(model.parameters(), lr=0.045, momentum=0.9)
+    model = FastSCNN(in_channels=3, num_classes=19).cuda()
+    optimizer = optim.SGD(model.parameters(), lr=0.045, momentum=0.9, weight_decay=4e-5)
     print("# trainable model parameters:", sum(param.numel() if param.requires_grad else 0
                                                for param in model.parameters()))
     lr_scheduler = PolynomialLRScheduler(optimizer, max_decay_steps=epochs, power=0.9)
     loss_criterion = nn.CrossEntropyLoss(ignore_index=255)
 
     # training loop
-    results = {'train_loss': [], 'test_loss': [], 'train_mIOU': [], 'test_mIOU': []}
-    best_miou = 0.0
+    results = {'train_loss': [], 'val_loss': []}
+    best_mPA = 0.0
     for epoch in range(1, epochs + 1):
         train_loss = train(model, train_loader, optimizer)
         results['train_loss'].append(train_loss)
-        # test_acc_1, test_acc_5 = test(model, memory_loader, test_loader)
-        # results['test_acc@1'].append(test_acc_1)
-        # results['test_acc@5'].append(test_acc_5)
+        val_loss = val(model, val_loader)
+        results['val_loss'].append(val_loss)
         # save statistics
-        # data_frame = pd.DataFrame(data=results, index=range(1, epoch + 1))
-        # data_frame.to_csv('results/{}_{}_results.csv'.format(crop_h, crop_w), index_label='epoch')
+        data_frame = pd.DataFrame(data=results, index=range(1, epoch + 1))
+        data_frame.to_csv('results/{}_{}_results.csv'.format(crop_h, crop_w), index_label='epoch')
         lr_scheduler.step()
         # if test_acc_1 > best_miou:
         #     best_miou = test_acc_1

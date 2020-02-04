@@ -1,7 +1,7 @@
 # Fast-SCNN
 A PyTorch implementation of Fast-SCNN based on the paper [Fast-SCNN: Fast Semantic Segmentation Network](https://arxiv.org/abs/1902.04502).
 
-![Network Architecture image from the paper](structure.png)
+![Network Architecture image from the paper](results/structure.png)
 
 ## Requirements
 - [Anaconda](https://www.anaconda.com/download/)
@@ -47,10 +47,9 @@ optional arguments:
 
 ## Results
 There are some difference between this implementation and official implementation:
-1. No `L2 regularization` used;
-2. The scales of `Multi-Scale Training` are `(0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0)`;
-3. No `color channels noise and brightness` used;
-4. No `auxiliary losses` at the end of `learning to downsample` and the `global feature extraction modules` used;
+1. The scales of `Multi-Scale Training` are `(0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0)`;
+2. No `color channels noise and brightness` used;
+3. No `auxiliary losses` at the end of `learning to downsample` and the `global feature extraction modules` used;
 
 <table>
 	<tbody>
