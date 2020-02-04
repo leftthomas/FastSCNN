@@ -15,41 +15,33 @@ from utils import PolynomialLRScheduler
 os.environ['CITYSCAPES_DATASET'] = 'results/'
 
 
-# train for one epoch
-def train(net, data_loader, train_optimizer):
-    net.train()
-    total_loss, total_num, train_bar = 0.0, 0, tqdm(data_loader)
-    for data, target in train_bar:
-        data, target = data.cuda(), target.cuda()
-        out = net(data)
-        loss = loss_criterion(out, target)
-        train_optimizer.zero_grad()
-        loss.backward()
-        train_optimizer.step()
+# train or val for one epoch
+def train_val(net, data_loader, train_optimizer):
+    is_train = train_optimizer is not None
+    net.train() if is_train else net.eval()
 
-        total_num += data.size(0)
-        total_loss += loss.item() * data.size(0)
-        train_bar.set_description('Train Epoch: [{}/{}] Loss: {:.4f}'.format(epoch, epochs, total_loss / total_num))
-
-    return total_loss / total_num
-
-
-# val for one epoch
-def val(net, data_loader):
-    net.eval()
-    total_loss, total_num, val_bar = 0.0, 0, tqdm(data_loader)
-    with torch.no_grad():
-        # loop val data to predict the label
-        for data, target in val_bar:
+    total_loss, total_correct, total_num, data_bar = 0.0, 0.0, 0, tqdm(data_loader)
+    with (torch.enable_grad() if is_train else torch.no_grad()):
+        for data, target in data_bar:
             data, target = data.cuda(), target.cuda()
             out = net(data)
             loss = loss_criterion(out, target)
+
+            if is_train:
+                train_optimizer.zero_grad()
+                loss.backward()
+                train_optimizer.step()
+
             total_num += data.size(0)
             total_loss += loss.item() * data.size(0)
+            prediction = torch.argmax(out, dim=1)
+            total_correct += torch.sum(prediction == target).item() / target.numel() * data.size(0)
 
-            val_bar.set_description('Val Epoch: [{}/{}] Loss: {:.4f}'.format(epoch, epochs, total_loss / total_num))
+            data_bar.set_description('{} Epoch: [{}/{}] Loss: {:.4f} mPA: {:.2f}%'
+                                     .format('Train' if is_train else 'Val', epoch, epochs,
+                                             total_loss / total_num, total_correct / total_num * 100))
 
-    return total_loss / total_num
+    return total_loss / total_num, total_correct / total_num * 100
 
 
 if __name__ == '__main__':
@@ -79,17 +71,19 @@ if __name__ == '__main__':
     loss_criterion = nn.CrossEntropyLoss(ignore_index=255)
 
     # training loop
-    results = {'train_loss': [], 'val_loss': []}
+    results = {'train_loss': [], 'val_loss': [], 'train_mPA': [], 'val_mPA': []}
     best_mPA = 0.0
     for epoch in range(1, epochs + 1):
-        train_loss = train(model, train_loader, optimizer)
+        train_loss, train_mPA = train_val(model, train_loader, optimizer)
         results['train_loss'].append(train_loss)
-        val_loss = val(model, val_loader)
+        results['train_mPA'].append(train_mPA)
+        val_loss, val_mPA = train_val(model, val_loader, None)
         results['val_loss'].append(val_loss)
+        results['val_mPA'].append(val_mPA)
         # save statistics
         data_frame = pd.DataFrame(data=results, index=range(1, epoch + 1))
-        data_frame.to_csv('results/{}_{}_results.csv'.format(crop_h, crop_w), index_label='epoch')
+        data_frame.to_csv('results/{}_{}_statistics.csv'.format(crop_h, crop_w), index_label='epoch')
         lr_scheduler.step()
-        # if test_acc_1 > best_miou:
-        #     best_miou = test_acc_1
-        #     torch.save(model.state_dict(), 'results/{}_{}_model.pth'.format(crop_h, crop_w))
+        if val_mPA > best_mPA:
+            best_mPA = val_mPA
+            torch.save(model.state_dict(), 'results/{}_{}_model.pth'.format(crop_h, crop_w))
