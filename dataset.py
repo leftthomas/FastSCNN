@@ -35,7 +35,7 @@ class Cityscapes(Dataset):
                 img_file = osp.join(root_dir, file)
                 label_file = osp.join(root_dir.replace('leftImg8bit', 'gtFine'),
                                       file.replace('leftImg8bit', 'gtFine_labelTrainIds'))
-                self.files.append({'img': img_file, 'label': label_file})
+                self.files.append({'img': img_file, 'label': label_file, 'name': file})
 
     def __len__(self):
         return len(self.files)
@@ -44,6 +44,7 @@ class Cityscapes(Dataset):
         datafiles = self.files[index]
         image = cv2.imread(datafiles['img'], cv2.IMREAD_COLOR)
         label = cv2.imread(datafiles['label'], cv2.IMREAD_GRAYSCALE)
+        name = datafiles['name']
 
         # random resize, multiple scale training
         if self.split == 'train':
@@ -89,4 +90,4 @@ class Cityscapes(Dataset):
             image = image[:, :, ::flip]
             label = label[:, ::flip]
 
-        return image.copy(), label.copy()
+        return image.copy(), label.copy(), name

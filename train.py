@@ -5,16 +5,16 @@ import time
 import pandas as pd
 import torch
 import torch.optim as optim
+from cityscapesscripts.helpers.labels import trainId2label
 from thop import profile, clever_format
 from torch import nn
 from torch.utils.data import DataLoader
+from torchvision.transforms import ToPILImage
 from tqdm import tqdm
 
 from dataset import Cityscapes
 from model import FastSCNN
 from utils import PolynomialLRScheduler
-
-os.environ['CITYSCAPES_DATASET'] = 'results/'
 
 
 # train or val for one epoch
@@ -24,7 +24,7 @@ def train_val(net, data_loader, train_optimizer):
 
     total_loss, total_correct, total_time, total_num, data_bar = 0.0, 0.0, 0.0, 0, tqdm(data_loader)
     with (torch.enable_grad() if is_train else torch.no_grad()):
-        for data, target in data_bar:
+        for data, target, name in data_bar:
             data, target = data.cuda(), target.cuda()
             torch.cuda.synchronize()
             start_time = time.time()
@@ -43,6 +43,14 @@ def train_val(net, data_loader, train_optimizer):
             total_time += end_time - start_time
             total_loss += loss.item() * data.size(0)
             total_correct += torch.sum(prediction == target).item() / target.numel() * data.size(0)
+
+            # revert train id to regular id
+            for key in trainId2label.keys():
+                prediction[prediction == key] = trainId2label[key].id
+            # save pred images
+            for pred_tensor, pred_name in zip(prediction, name):
+                pred_img = ToPILImage()(pred_tensor.unsqueeze(dim=0).byte().cpu())
+                pred_img.save('results/out/{}'.format(pred_name.replace('leftImg8bit', 'pred')))
 
             data_bar.set_description('{} Epoch: [{}/{}] Loss: {:.4f} mPA: {:.2f}% FPS: {:.0f}'
                                      .format('Train' if is_train else 'Val', epoch, epochs, total_loss / total_num,
@@ -64,6 +72,12 @@ if __name__ == '__main__':
     args = parser.parse_args()
     data_path, crop_h, crop_w = args.data_path, args.crop_h, args.crop_w
     batch_size, epochs = args.batch_size, args.epochs
+
+    # env setting
+    if not os.path.exists('results/out'):
+        os.mkdir('results/out')
+    os.environ['CITYSCAPES_DATASET'] = data_path
+    os.environ['CITYSCAPES_RESULTS'] = 'results/out'
 
     # dataset, model setup and optimizer config
     train_data = Cityscapes(root=data_path, split='train', crop_size=(crop_h, crop_w))
