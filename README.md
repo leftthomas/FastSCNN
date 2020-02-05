@@ -83,20 +83,19 @@ There are some difference between this implementation and official implementatio
 		<th>Crop Size</th>
 		<th>Batch Size</th>
 		<th>Epochs</th>
-		<th>Params</th>
-		<th>FLOPs</th>
+		<th>Params (M)</th>
+		<th>FLOPs (G)</th>
 		<th>FPS</th>
-		<th>mIOU</th>
+		<th>Val mIOU</th>
 		<th>Download</th>
 		<!-- TABLE BODY -->
-		<!-- ROW: r18 -->
 		<tr>
 			<td align="center">(1024, 2048)</td>
 			<td align="center">12</td>
 			<td align="center">1000</td>
-			<td align="center">1.11M</td>
-			<td align="center">5.8G</td>
-			<td align="center">210</td>
+			<td align="center">1.10</td>
+			<td align="center">5.83</td>
+			<td align="center">208</td>
 			<td align="center">-</td>
 			<td align="center"><a href="https://pan.baidu.com/s/1akdeCaWiKQ03MeTD_MeapA">model</a>&nbsp;|&nbsp;v7qm</td>
 		</tr>
