@@ -45,7 +45,7 @@ def train_val(net, data_loader, train_optimizer):
             total_loss += loss.item() * data.size(0)
             total_correct += torch.sum(prediction == target).item() / target.numel() * data.size(0)
 
-            if not is_train:
+            if not is_train and epoch % save_step == 0:
                 # revert train id to regular id
                 for key in trainId2label.keys():
                     prediction[prediction == key] = trainId2label[key].id
@@ -69,12 +69,13 @@ if __name__ == '__main__':
     parser.add_argument('--crop_h', default=1024, type=int, help='Crop height for training images')
     parser.add_argument('--crop_w', default=2048, type=int, help='Crop width for training images')
     parser.add_argument('--batch_size', default=12, type=int, help='Number of data for each batch to train')
+    parser.add_argument('--save_step', default=50, type=int, help='Number of steps to save predicted results')
     parser.add_argument('--epochs', default=1000, type=int, help='Number of sweeps over the dataset to train')
 
     # args parse
     args = parser.parse_args()
     data_path, crop_h, crop_w = args.data_path, args.crop_h, args.crop_w
-    batch_size, epochs = args.batch_size, args.epochs
+    batch_size, save_step, epochs = args.batch_size, args.save_step, args.epochs
     if not os.path.exists('results'):
         os.mkdir('results')
 
