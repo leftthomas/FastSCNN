@@ -71,7 +71,8 @@ optional arguments:
 ```
 
 ## Results
-There are some difference between this implementation and official implementation:
+The experiment is conducted on one NVIDIA Tesla V100 (32G) GPU, and there are some difference between this 
+implementation and official implementation:
 1. The scales of `Multi-Scale Training` are `(0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0)`;
 2. No `color channels noise and brightness` used;
 3. No `auxiliary losses` at the end of `learning to downsample` and the `global feature extraction modules` used.
@@ -101,3 +102,7 @@ There are some difference between this implementation and official implementatio
 		</tr>
 	</tbody>
 </table>
+
+The left is input image, the middle is ground truth segmentation, and the right is model's predicted segmentation.
+
+![frankfurt_000001_082466](frankfurt_000001_082466_result.png)
