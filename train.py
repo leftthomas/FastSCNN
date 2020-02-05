@@ -72,12 +72,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
     data_path, crop_h, crop_w = args.data_path, args.crop_h, args.crop_w
     batch_size, epochs = args.batch_size, args.epochs
-
-    # env setting
     if not os.path.exists('results/out'):
         os.mkdir('results/out')
-    os.environ['CITYSCAPES_DATASET'] = data_path
-    os.environ['CITYSCAPES_RESULTS'] = 'results/out'
 
     # dataset, model setup and optimizer config
     train_data = Cityscapes(root=data_path, split='train', crop_size=(crop_h, crop_w))
