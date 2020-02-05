@@ -74,22 +74,20 @@ optional arguments:
 There are some difference between this implementation and official implementation:
 1. The scales of `Multi-Scale Training` are `(0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0)`;
 2. No `color channels noise and brightness` used;
-3. No `auxiliary losses` at the end of `learning to downsample` and the `global feature extraction modules` used;
+3. No `auxiliary losses` at the end of `learning to downsample` and the `global feature extraction modules` used.
 
 <table>
 	<tbody>
 		<!-- START TABLE -->
 		<!-- TABLE HEADER -->
-		<th>Backbone</th>
-		<th>feature dim</th>
-		<th>batch size</th>
-		<th>epoch num</th>
-		<th>temperature</th>
-		<th>momentum</th>
-		<th>k</th>
-		<th>Top1 Acc %</th>
-		<th>Top5 Acc %</th>
-		<th>download link</th>
+		<th>Crop Size</th>
+		<th>Batch Size</th>
+		<th>Epochs</th>
+		<th>Params</th>
+		<th>FLOPs</th>
+		<th>FPS</th>
+		<th>mIOU</th>
+		<th>Download</th>
 		<!-- TABLE BODY -->
 		<!-- ROW: r18 -->
 		<tr>
@@ -100,8 +98,6 @@ There are some difference between this implementation and official implementatio
 			<td align="center">0.1</td>
 			<td align="center">0.5</td>
 			<td align="center">200</td>
-			<td align="center">80.64</td>
-			<td align="center">98.56</td>
 			<td align="center"><a href="https://pan.baidu.com/s/1akdeCaWiKQ03MeTD_MeapA">model</a>&nbsp;|&nbsp;v7qm</td>
 		</tr>
 	</tbody>
