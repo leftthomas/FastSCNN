@@ -43,6 +43,7 @@ export CITYSCAPES_DATASET=/home/data/cityscapes
 and then run [createTrainIdLabelImgs.py](https://github.com/mcordts/cityscapesScripts/blob/master/cityscapesscripts/preparation/createTrainIdLabelImgs.py) to creat `labelTrainIds.png`.
 
 ## Usage
+### Train model
 ```
 python train.py --crop_h 512 --crop_w 1024
 optional arguments:
@@ -50,6 +51,7 @@ optional arguments:
 --crop_h                      Crop height for training images [default value is 1024]
 --crop_w                      Crop width for training images [default value is 2048]
 --batch_size                  Number of data for each batch to train [default value is 12]
+--save_step                   Number of steps to save predicted results [default value is 50]
 --epochs                      Number of sweeps over the dataset to train [default value is 1000]
 ```
 Set environment variable `CITYSCAPES_DATASET` and `CITYSCAPES_RESULTS` firstly, for example: 
@@ -58,6 +60,15 @@ export CITYSCAPES_DATASET=/home/data/cityscapes
 export CITYSCAPES_RESULTS=/home/code/Fast-SCNN/results
 ```
 and then run [evalPixelLevelSemanticLabeling.py](https://github.com/mcordts/cityscapesScripts/blob/master/cityscapesscripts/evaluation/evalPixelLevelSemanticLabeling.py) to eval the predicted segmentation.
+
+### Eval model
+```
+python viewer.py --model_weight 512_1024_model.pth
+optional arguments:
+--data_path                   Data path for cityscapes dataset [default value is '/home/data/cityscapes']
+--model_weight                Pretrained model weight [default value is '1024_2048_model.pth']
+--input_pic                   Path to the input picture [default value is 'test/berlin/berlin_000000_000019_leftImg8bit.png']
+```
 
 ## Results
 There are some difference between this implementation and official implementation:

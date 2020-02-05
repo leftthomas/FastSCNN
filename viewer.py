@@ -12,9 +12,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Predict segmentation result from a given image')
     parser.add_argument('--data_path', default='/home/data/cityscapes', type=str,
                         help='Data path for cityscapes dataset')
-    parser.add_argument('--model_weight', type=str, default='1024_2048_model.pth', help='pretrained model weight')
+    parser.add_argument('--model_weight', type=str, default='1024_2048_model.pth', help='Pretrained model weight')
     parser.add_argument('--input_pic', type=str, default='test/berlin/berlin_000000_000019_leftImg8bit.png',
-                        help='path to the input picture')
+                        help='Path to the input picture')
     # args parse
     args = parser.parse_args()
     data_path, model_weight, input_pic = args.data_path, args.model_weight, args.input_pic
