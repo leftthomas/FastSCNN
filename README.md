@@ -36,7 +36,11 @@ cityscapes/
     train/
     val/
 ```
-run [createTrainIdLabelImgs.py](https://github.com/mcordts/cityscapesScripts/blob/master/cityscapesscripts/preparation/createTrainIdLabelImgs.py) to creat `labelTrainIds.png`.
+Set environment variable `CITYSCAPES_DATASET` firstly, for example:
+```
+export CITYSCAPES_DATASET=/home/data/cityscapes
+```
+and then run [createTrainIdLabelImgs.py](https://github.com/mcordts/cityscapesScripts/blob/master/cityscapesscripts/preparation/createTrainIdLabelImgs.py) to creat `labelTrainIds.png`.
 
 ## Usage
 ```
@@ -48,7 +52,12 @@ optional arguments:
 --batch_size                  Number of data for each batch to train [default value is 12]
 --epochs                      Number of sweeps over the dataset to train [default value is 1000]
 ```
-run [evalPixelLevelSemanticLabeling.py](https://github.com/mcordts/cityscapesScripts/blob/master/cityscapesscripts/evaluation/evalPixelLevelSemanticLabeling.py) to eval the predicted segmentation.
+Set environment variable `CITYSCAPES_DATASET` and `CITYSCAPES_RESULTS` firstly, for example: 
+```
+export CITYSCAPES_DATASET=/home/data/cityscapes
+export CITYSCAPES_RESULTS=/home/code/Fast-SCNN/results
+```
+and then run [evalPixelLevelSemanticLabeling.py](https://github.com/mcordts/cityscapesScripts/blob/master/cityscapesscripts/evaluation/evalPixelLevelSemanticLabeling.py) to eval the predicted segmentation.
 
 ## Results
 There are some difference between this implementation and official implementation:
