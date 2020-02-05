@@ -91,13 +91,13 @@ There are some difference between this implementation and official implementatio
 		<!-- TABLE BODY -->
 		<!-- ROW: r18 -->
 		<tr>
-			<td align="center">ResNet18</td>
-			<td align="center">128</td>
-			<td align="center">128</td>
-			<td align="center">200</td>
-			<td align="center">0.1</td>
-			<td align="center">0.5</td>
-			<td align="center">200</td>
+			<td align="center">(1024, 2048)</td>
+			<td align="center">12</td>
+			<td align="center">1000</td>
+			<td align="center">1.11M</td>
+			<td align="center">5.8G</td>
+			<td align="center">210</td>
+			<td align="center">-</td>
 			<td align="center"><a href="https://pan.baidu.com/s/1akdeCaWiKQ03MeTD_MeapA">model</a>&nbsp;|&nbsp;v7qm</td>
 		</tr>
 	</tbody>
