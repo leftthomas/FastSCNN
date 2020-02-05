@@ -1,5 +1,4 @@
 import argparse
-import os
 import time
 
 import pandas as pd
@@ -44,13 +43,14 @@ def train_val(net, data_loader, train_optimizer):
             total_loss += loss.item() * data.size(0)
             total_correct += torch.sum(prediction == target).item() / target.numel() * data.size(0)
 
-            # revert train id to regular id
-            for key in trainId2label.keys():
-                prediction[prediction == key] = trainId2label[key].id
-            # save pred images
-            for pred_tensor, pred_name in zip(prediction, name):
-                pred_img = ToPILImage()(pred_tensor.unsqueeze(dim=0).byte().cpu())
-                pred_img.save('results/out/{}'.format(pred_name.replace('leftImg8bit', 'pred')))
+            if not is_train:
+                # revert train id to regular id
+                for key in trainId2label.keys():
+                    prediction[prediction == key] = trainId2label[key].id
+                # save pred images
+                for pred_tensor, pred_name in zip(prediction, name):
+                    pred_img = ToPILImage()(pred_tensor.unsqueeze(dim=0).byte().cpu())
+                    pred_img.save('results/{}'.format(pred_name.replace('leftImg8bit', 'pred')))
 
             data_bar.set_description('{} Epoch: [{}/{}] Loss: {:.4f} mPA: {:.2f}% FPS: {:.0f}'
                                      .format('Train' if is_train else 'Val', epoch, epochs, total_loss / total_num,
@@ -72,8 +72,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
     data_path, crop_h, crop_w = args.data_path, args.crop_h, args.crop_w
     batch_size, epochs = args.batch_size, args.epochs
-    if not os.path.exists('results/out'):
-        os.mkdir('results/out')
 
     # dataset, model setup and optimizer config
     train_data = Cityscapes(root=data_path, split='train', crop_size=(crop_h, crop_w))
@@ -102,8 +100,8 @@ if __name__ == '__main__':
         results['val_mPA'].append(val_mPA)
         # save statistics
         data_frame = pd.DataFrame(data=results, index=range(1, epoch + 1))
-        data_frame.to_csv('results/{}_{}_statistics.csv'.format(crop_h, crop_w), index_label='epoch')
+        data_frame.to_csv('{}_{}_statistics.csv'.format(crop_h, crop_w), index_label='epoch')
         lr_scheduler.step()
         if val_mPA > best_mPA:
             best_mPA = val_mPA
-            torch.save(model.state_dict(), 'results/{}_{}_model.pth'.format(crop_h, crop_w))
+            torch.save(model.state_dict(), '{}_{}_model.pth'.format(crop_h, crop_w))
