@@ -53,7 +53,7 @@ def train_val(net, data_loader, train_optimizer):
                 for pred_tensor, pred_name in zip(prediction, name):
                     pred_img = ToPILImage()(pred_tensor.unsqueeze(dim=0).byte().cpu())
                     pred_img.putpalette(palette)
-                    pred_img.save('results/{}'.format(pred_name.replace('leftImg8bit', 'pred')))
+                    pred_img.save('results/{}'.format(pred_name.replace('leftImg8bit', 'color')))
 
             data_bar.set_description('{} Epoch: [{}/{}] Loss: {:.4f} mPA: {:.2f}% FPS: {:.0f}'
                                      .format('Train' if is_train else 'Val', epoch, epochs, total_loss / total_num,
