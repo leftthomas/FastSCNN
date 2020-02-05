@@ -6,6 +6,8 @@ import cv2
 import numpy as np
 from torch.utils.data import Dataset
 
+from utils import city_mean, city_std
+
 
 class Cityscapes(Dataset):
     """
@@ -17,16 +19,17 @@ class Cityscapes(Dataset):
           ├── leftImg8bit
         split: train, val
         crop_size: (512, 1024), only works for 'train' split
-        mean: bgr_mean (73.15835921, 82.90891754, 72.39239876)
+        mean: rgb_mean (0.485, 0.456, 0.406)
+        std: rgb_mean (0.229, 0.224, 0.225)
         ignore_label: 255
     """
 
-    def __init__(self, root, split='train', crop_size=(512, 1024), mean=(73.15835921, 82.90891754, 72.39239876),
-                 ignore_label=255):
+    def __init__(self, root, split='train', crop_size=(512, 1024), mean=city_mean, std=city_std, ignore_label=255):
 
         self.split = split
         self.crop_h, self.crop_w = crop_size
         self.mean = mean
+        self.std = std
         self.ignore_label = ignore_label
         self.files = []
 
@@ -53,11 +56,12 @@ class Cityscapes(Dataset):
             label = cv2.resize(label, None, fx=f_scale, fy=f_scale, interpolation=cv2.INTER_NEAREST)
 
         image = np.asarray(image, np.float32)
-        # normalization
-        image -= self.mean
-        image = image / 255.0
         # change to RGB
         image = image[:, :, ::-1]
+        # normalization
+        image /= 255.0
+        image -= self.mean
+        image /= self.std
 
         # random crop
         if self.split == 'train':

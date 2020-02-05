@@ -1,4 +1,5 @@
 import argparse
+import os
 import time
 
 import pandas as pd
@@ -14,6 +15,7 @@ from tqdm import tqdm
 from dataset import Cityscapes
 from model import FastSCNN
 from utils import PolynomialLRScheduler
+from utils import palette
 
 
 # train or val for one epoch
@@ -50,6 +52,7 @@ def train_val(net, data_loader, train_optimizer):
                 # save pred images
                 for pred_tensor, pred_name in zip(prediction, name):
                     pred_img = ToPILImage()(pred_tensor.unsqueeze(dim=0).byte().cpu())
+                    pred_img.putpalette(palette)
                     pred_img.save('results/{}'.format(pred_name.replace('leftImg8bit', 'pred')))
 
             data_bar.set_description('{} Epoch: [{}/{}] Loss: {:.4f} mPA: {:.2f}% FPS: {:.0f}'
@@ -72,6 +75,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
     data_path, crop_h, crop_w = args.data_path, args.crop_h, args.crop_w
     batch_size, epochs = args.batch_size, args.epochs
+    if not os.path.exists('results'):
+        os.mkdir('results')
 
     # dataset, model setup and optimizer config
     train_data = Cityscapes(root=data_path, split='train', crop_size=(crop_h, crop_w))
