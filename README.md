@@ -87,7 +87,8 @@ implementation and official implementation:
 		<th>Params (M)</th>
 		<th>FLOPs (G)</th>
 		<th>FPS</th>
-		<th>Val mIOU</th>
+		<th>Class mIOU</th>
+		<th>Category mIOU</th>
 		<th>Download</th>
 		<!-- TABLE BODY -->
 		<tr>
@@ -97,7 +98,8 @@ implementation and official implementation:
 			<td align="center">1.10</td>
 			<td align="center">5.83</td>
 			<td align="center">208</td>
-			<td align="center">-</td>
+			<td align="center">23.8</td>
+			<td align="center">56.8</td>
 			<td align="center"><a href="https://pan.baidu.com/s/1akdeCaWiKQ03MeTD_MeapA">model</a>&nbsp;|&nbsp;v7qm</td>
 		</tr>
 	</tbody>
