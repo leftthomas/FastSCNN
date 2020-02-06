@@ -92,7 +92,7 @@ implementation and official implementation:
 		<th>Download</th>
 		<!-- TABLE BODY -->
 		<tr>
-			<td align="center">(1024, 2048)</td>
+			<td align="center">1024*2048</td>
 			<td align="center">12</td>
 			<td align="center">1000</td>
 			<td align="center">1.10</td>
