@@ -14,7 +14,6 @@ from tqdm import tqdm
 
 from dataset import Cityscapes
 from model import FastSCNN
-from utils import PolynomialLRScheduler
 from utils import palette
 
 
@@ -69,8 +68,8 @@ if __name__ == '__main__':
     parser.add_argument('--crop_h', default=1024, type=int, help='Crop height for training images')
     parser.add_argument('--crop_w', default=2048, type=int, help='Crop width for training images')
     parser.add_argument('--batch_size', default=12, type=int, help='Number of data for each batch to train')
-    parser.add_argument('--save_step', default=50, type=int, help='Number of steps to save predicted results')
-    parser.add_argument('--epochs', default=1000, type=int, help='Number of sweeps over the dataset to train')
+    parser.add_argument('--save_step', default=5, type=int, help='Number of steps to save predicted results')
+    parser.add_argument('--epochs', default=100, type=int, help='Number of sweeps over the dataset to train')
 
     # args parse
     args = parser.parse_args()
@@ -85,13 +84,13 @@ if __name__ == '__main__':
     train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True, num_workers=4)
     val_loader = DataLoader(val_data, batch_size=batch_size, shuffle=False, num_workers=4)
     model = FastSCNN(in_channels=3, num_classes=19).cuda()
-    optimizer = optim.SGD(model.parameters(), lr=0.045, momentum=0.9, weight_decay=4e-5)
+    optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
     # model profile, learning scheduler and loss definition
     flops, params = profile(model, inputs=(torch.randn(1, 3, crop_h, crop_w).cuda(),))
     flops, params = clever_format([flops, params])
     print('# Model Params: {} FLOPs: {}'.format(params, flops))
-    lr_scheduler = PolynomialLRScheduler(optimizer, max_decay_steps=epochs, power=0.9)
+    # lr_scheduler = PolynomialLRScheduler(optimizer, max_decay_steps=epochs, power=0.9)
     loss_criterion = nn.CrossEntropyLoss(ignore_index=255)
 
     # training loop
@@ -107,7 +106,7 @@ if __name__ == '__main__':
         # save statistics
         data_frame = pd.DataFrame(data=results, index=range(1, epoch + 1))
         data_frame.to_csv('{}_{}_statistics.csv'.format(crop_h, crop_w), index_label='epoch')
-        lr_scheduler.step()
+        # lr_scheduler.step()
         if val_mPA > best_mPA:
             best_mPA = val_mPA
             torch.save(model.state_dict(), '{}_{}_model.pth'.format(crop_h, crop_w))

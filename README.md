@@ -51,8 +51,8 @@ optional arguments:
 --crop_h                      Crop height for training images [default value is 1024]
 --crop_w                      Crop width for training images [default value is 2048]
 --batch_size                  Number of data for each batch to train [default value is 12]
---save_step                   Number of steps to save predicted results [default value is 50]
---epochs                      Number of sweeps over the dataset to train [default value is 1000]
+--save_step                   Number of steps to save predicted results [default value is 5]
+--epochs                      Number of sweeps over the dataset to train [default value is 100]
 ```
 Set environment variable `CITYSCAPES_DATASET` and `CITYSCAPES_RESULTS` firstly, for example: 
 ```
@@ -75,31 +75,29 @@ The experiment is conducted on one NVIDIA Tesla V100 (32G) GPU, and there are so
 implementation and official implementation:
 1. The scales of `Multi-Scale Training` are `(0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0)`;
 2. No `color channels noise and brightness` used;
-3. No `auxiliary losses` at the end of `learning to downsample` and the `global feature extraction modules` used.
+3. No `auxiliary losses` at the end of `learning to downsample` and the `global feature extraction modules` used;
+4. The training `epochs` is `100`;
+5. `Adam` optimizer with learning rate `1e-3` is used to train this model.
 
 <table>
 	<tbody>
 		<!-- START TABLE -->
 		<!-- TABLE HEADER -->
-		<th>Crop Size</th>
-		<th>Batch Size</th>
-		<th>Epochs</th>
 		<th>Params (M)</th>
 		<th>FLOPs (G)</th>
 		<th>FPS</th>
+		<th>Pixel Accuracy</th>
 		<th>Class mIOU</th>
 		<th>Category mIOU</th>
 		<th>Download</th>
 		<!-- TABLE BODY -->
 		<tr>
-			<td align="center">1024*2048</td>
-			<td align="center">12</td>
-			<td align="center">1000</td>
 			<td align="center">1.10</td>
 			<td align="center">5.83</td>
 			<td align="center">208</td>
-			<td align="center">23.8</td>
-			<td align="center">56.8</td>
+			<td align="center">80.2</td>
+			<td align="center">60.2</td>
+			<td align="center">80.7</td>
 			<td align="center"><a href="https://pan.baidu.com/s/1akdeCaWiKQ03MeTD_MeapA">model</a>&nbsp;|&nbsp;v7qm</td>
 		</tr>
 	</tbody>
@@ -107,4 +105,4 @@ implementation and official implementation:
 
 The left is input image, the middle is ground truth segmentation, and the right is model's predicted segmentation.
 
-![frankfurt_000001_082466](frankfurt_000001_082466_result.png)
+![munster_000120_000019](munster_000120_000019_result.png)
