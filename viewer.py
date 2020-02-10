@@ -5,8 +5,8 @@ import torch
 from PIL import Image
 from torchvision.transforms import ToPILImage
 
+from dataset import transform, palette
 from model import FastSCNN
-from utils import transform, palette
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Predict segmentation result from a given image')

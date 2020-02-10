@@ -12,9 +12,8 @@ from torch.utils.data import DataLoader
 from torchvision.transforms import ToPILImage
 from tqdm import tqdm
 
-from dataset import Cityscapes
+from dataset import Cityscapes, palette
 from model import FastSCNN
-from utils import palette
 
 
 # train or val for one epoch
@@ -86,11 +85,10 @@ if __name__ == '__main__':
     model = FastSCNN(in_channels=3, num_classes=19).cuda()
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
-    # model profile, learning scheduler and loss definition
+    # model profile and loss definition
     flops, params = profile(model, inputs=(torch.randn(1, 3, crop_h, crop_w).cuda(),))
     flops, params = clever_format([flops, params])
     print('# Model Params: {} FLOPs: {}'.format(params, flops))
-    # lr_scheduler = PolynomialLRScheduler(optimizer, max_decay_steps=epochs, power=0.9)
     loss_criterion = nn.CrossEntropyLoss(ignore_index=255)
 
     # training loop
@@ -106,7 +104,6 @@ if __name__ == '__main__':
         # save statistics
         data_frame = pd.DataFrame(data=results, index=range(1, epoch + 1))
         data_frame.to_csv('{}_{}_statistics.csv'.format(crop_h, crop_w), index_label='epoch')
-        # lr_scheduler.step()
         if val_mPA > best_mPA:
             best_mPA = val_mPA
             torch.save(model.state_dict(), '{}_{}_model.pth'.format(crop_h, crop_w))
