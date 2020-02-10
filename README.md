@@ -77,7 +77,8 @@ implementation and official implementation:
 2. No `color channels noise and brightness` used;
 3. No `auxiliary losses` at the end of `learning to downsample` and the `global feature extraction modules` used;
 4. The training `epochs` is `100`;
-5. `Adam` optimizer with learning rate `1e-3` is used to train this model.
+5. `Adam` optimizer with learning rate `1e-3` is used to train this model;
+6. No `Polynomial Learning Scheduler` used.
 
 <table>
 	<tbody>
@@ -95,10 +96,10 @@ implementation and official implementation:
 			<td align="center">1.10</td>
 			<td align="center">5.83</td>
 			<td align="center">208</td>
-			<td align="center">80.2</td>
+			<td align="center">81.5</td>
 			<td align="center">60.2</td>
 			<td align="center">80.7</td>
-			<td align="center"><a href="https://pan.baidu.com/s/1akdeCaWiKQ03MeTD_MeapA">model</a>&nbsp;|&nbsp;v7qm</td>
+			<td align="center"><a href="https://pan.baidu.com/s/1cmcAtDewYs2lWK7LaktofQ">model</a>&nbsp;|&nbsp;eg6a</td>
 		</tr>
 	</tbody>
 </table>
