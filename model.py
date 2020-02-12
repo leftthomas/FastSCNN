@@ -98,8 +98,20 @@ class Classifier(nn.Module):
         super().__init__()
 
         self.scale_factor = scale_factor
-        self.dsconv1 = ConvBlock(in_channels=128, out_channels=128, stride=1, dilation=1, groups=128)
-        self.dsconv2 = ConvBlock(in_channels=128, out_channels=128, stride=1, dilation=1, groups=128)
+        self.dsconv1 = nn.Sequential(
+            # depthwise convolution
+            nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1, dilation=1, groups=128, bias=False),
+            nn.BatchNorm2d(128),
+            # pointwise convolution
+            nn.Conv2d(128, 128, kernel_size=1, stride=1, padding=0, dilation=1, groups=1, bias=False),
+            nn.BatchNorm2d(128),
+            nn.ReLU(inplace=True))
+        self.dsconv2 = nn.Sequential(
+            nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1, dilation=1, groups=128, bias=False),
+            nn.BatchNorm2d(128),
+            nn.Conv2d(128, 128, kernel_size=1, stride=1, padding=0, dilation=1, groups=1, bias=False),
+            nn.BatchNorm2d(128),
+            nn.ReLU(inplace=True))
         self.drop_out = nn.Dropout(p=0.1)
         self.conv = nn.Conv2d(128, num_classes, kernel_size=1, stride=1, padding=0, bias=True)
 
