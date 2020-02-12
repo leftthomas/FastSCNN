@@ -93,8 +93,8 @@ implementation and official implementation:
 		<th>Download</th>
 		<!-- TABLE BODY -->
 		<tr>
-			<td align="center">1.10</td>
-			<td align="center">5.83</td>
+			<td align="center">1.14</td>
+			<td align="center">6.92</td>
 			<td align="center">208</td>
 			<td align="center">81.5</td>
 			<td align="center">60.2</td>
