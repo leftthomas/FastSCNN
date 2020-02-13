@@ -95,7 +95,7 @@ implementation and official implementation:
 		<tr>
 			<td align="center">1.14</td>
 			<td align="center">6.92</td>
-			<td align="center">208</td>
+			<td align="center">197</td>
 			<td align="center">81.5</td>
 			<td align="center">60.2</td>
 			<td align="center">80.7</td>
