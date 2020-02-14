@@ -97,8 +97,8 @@ implementation and official implementation:
 			<td align="center">6.92</td>
 			<td align="center">197</td>
 			<td align="center">81.5</td>
-			<td align="center">60.2</td>
-			<td align="center">80.7</td>
+			<td align="center">58.0</td>
+			<td align="center">81.7</td>
 			<td align="center"><a href="https://pan.baidu.com/s/1cmcAtDewYs2lWK7LaktofQ">model</a>&nbsp;|&nbsp;eg6a</td>
 		</tr>
 	</tbody>
